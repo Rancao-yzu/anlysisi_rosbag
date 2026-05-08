@@ -30,6 +30,8 @@ def export_to_csv(topic_data, output_dir, bag_name):
                     continue
                 if key.startswith('header.'):
                     continue
+                if key.startswith('layout.'):
+                    continue
                 if key not in other_fields:
                     other_fields.append(key)
         all_fields = ['n_id', '_time'] + other_fields
@@ -42,7 +44,7 @@ def export_to_csv(topic_data, output_dir, bag_name):
             writer.writeheader()
             for i, msg_dict in enumerate(msgs, 1):
                 row = {k: v for k, v in msg_dict.items()
-                        if not k.startswith('header.')}
+                        if not k.startswith('header.') and not k.startswith('layout.')}
                 row = {'n_id': i, **row}
                 writer.writerow(row)
 
