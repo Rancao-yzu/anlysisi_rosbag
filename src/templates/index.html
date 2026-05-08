@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bag Parser - ROS Bag 解析工具</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container"> 
+        <header class="app-header">
+            <h1>📦 Bag Parser</h1>
+            <p>ROS Bag 文件解析与 CSV 导出工具 V1.0</p>
+            <p>@ 威孚智感（无锡）科技有限公司 版权所有</p>
+        </header>
+
+        <main class="app-main">
+            <!-- 第一步：路径选择 -->
+            <section class="card" id="section-path">
+                <div class="card-header">
+                    <span class="step-badge">1</span>
+                    <h2>选择 Bag 文件目录</h2>
+                </div>
+                <div class="card-body">
+                    <div class="input-row">
+                        <input
+                            type="text"
+                            id="path-input"
+                            class="input"
+                            placeholder="请输入 Bag 文件所在目录的绝对路径，如 /home/user/bags"
+                            autocomplete="off"
+                        >
+                        <button id="btn-scan" class="btn btn-primary">
+                            <span class="btn-icon">🔍</span>
+                            <span class="btn-text">扫描</span>
+                        </button>
+                    </div>
+                    <div class="path-hint" id="path-hint"></div>
+                </div>
+            </section>
+
+            <!-- 第二步：Bag 文件列表 -->
+            <section class="card" id="section-files" style="display:none;">
+                <div class="card-header">
+                    <span class="step-badge">2</span>
+                    <h2>选择 Bag 文件</h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-bar" id="files-info"></div>
+                    <div class="file-list" id="file-list"></div>
+                </div>
+            </section>
+
+            <!-- 第三步：Topic 选择 -->
+            <section class="card" id="section-topics" style="display:none;">
+                <div class="card-header">
+                    <span class="step-badge">3</span>
+                    <h2>选择 Topic 并处理</h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-bar" id="topics-info"></div>
+                    <div class="topic-toolbar">
+                        <button id="btn-select-all" class="btn btn-sm btn-outline">全选</button>
+                        <button id="btn-deselect-all" class="btn btn-sm btn-outline">取消全选</button>
+                        <div class="msg-count-row">
+                            <label for="max-msgs">每条导出消息数:</label>
+                            <input type="number" id="max-msgs" class="input input-sm" value="3" min="1" max="100">
+                            <label class="all-check" for="export-all">
+                                <input type="checkbox" id="export-all">
+                                导出全部
+                            </label>
+                        </div>
+                    </div>
+                    <div class="topic-list" id="topic-list"></div>
+                    <div class="action-row">
+                        <button id="btn-process" class="btn btn-primary btn-lg">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-text">开始处理导出</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第四步：处理结果 -->
+            <section class="card" id="section-result" style="display:none;">
+                <div class="card-header">
+                    <span class="step-badge done">✓</span>
+                    <h2>处理结果</h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-bar success" id="result-info"></div>
+                    <div class="result-files" id="result-files"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 状态 Toast -->
+        <div id="toast" class="toast"></div>
+
+        <!-- Loading 遮罩 -->
+        <div id="loading-overlay" class="loading-overlay" style="display:none;">
+            <div class="spinner"></div>
+            <p id="loading-text">处理中...</p>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
