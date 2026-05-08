@@ -7,12 +7,63 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="app-container"> 
+    <div class="app-container">
         <header class="app-header">
-            <h1>📦 Bag Parser</h1>
-            <p>ROS Bag 文件解析与 CSV 导出工具 V1.0</p>
-            <p>@ 威孚智感（无锡）科技有限公司 版权所有</p>
+            <div class="header-brand">
+                <div class="brand-logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="10" fill="url(#logo-grad)"/>
+                        <path d="M12 20C12 15.5817 15.5817 12 20 12C24.4183 12 28 15.5817 28 20C28 24.4183 24.4183 28 20 28" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="20" cy="20" r="3" fill="white"/>
+                        <path d="M20 28L20 32" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 30L20 32L24 30" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logo-grad" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#4f6ef7"/>
+                                <stop offset="100%" stop-color="#2563eb"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>Bag Parser</h1>
+                    <p class="brand-subtitle">ROS Bag 文件解析与 CSV 导出工具 V1.0</p>
+                </div>
+            </div>
+            <div class="header-mission">
+                <span class="mission-tag">专注</span>
+                <span class="mission-tag">创新</span>
+                <span class="mission-tag">担当</span>
+                <span class="mission-tag">融合</span>
+                <p class="mission-text">致力于成为自动驾驶智能感知解决方案工业专家</p>
+            </div>
+            <div class="header-copyright">
+                <p>@<a href="http://wfss.weifu.com.cn/index.html">威孚智感（无锡）科技有限公司</a> 版权所有</p>
+            </div>
         </header>
+
+        <!-- 步骤指示器 -->
+        <div class="steps-indicator">
+            <div class="step-indicator active" data-step="1">
+                <div class="step-dot"><span>1</span></div>
+                <span class="step-label">选择目录</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-indicator" data-step="2">
+                <div class="step-dot"><span>2</span></div>
+                <span class="step-label">选择文件</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-indicator" data-step="3">
+                <div class="step-dot"><span>3</span></div>
+                <span class="step-label">选择 Topic</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-indicator" data-step="4">
+                <div class="step-dot"><span>4</span></div>
+                <span class="step-label">完成导出</span>
+            </div>
+        </div>
 
         <main class="app-main">
             <!-- 第一步：路径选择 -->
@@ -31,8 +82,8 @@
                             autocomplete="off"
                         >
                         <button id="btn-scan" class="btn btn-primary">
-                            <span class="btn-icon">🔍</span>
-                            <span class="btn-text">扫描</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                            <span>扫描</span>
                         </button>
                     </div>
                     <div class="path-hint" id="path-hint"></div>
@@ -74,8 +125,8 @@
                     <div class="topic-list" id="topic-list"></div>
                     <div class="action-row">
                         <button id="btn-process" class="btn btn-primary btn-lg">
-                            <span class="btn-icon">⚡</span>
-                            <span class="btn-text">开始处理导出</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            <span>开始处理导出</span>
                         </button>
                     </div>
                 </div>
@@ -84,7 +135,9 @@
             <!-- 第四步：处理结果 -->
             <section class="card" id="section-result" style="display:none;">
                 <div class="card-header">
-                    <span class="step-badge done">✓</span>
+                    <span class="step-badge done">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
                     <h2>处理结果</h2>
                 </div>
                 <div class="card-body">

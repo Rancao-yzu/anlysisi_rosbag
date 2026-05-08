@@ -63,7 +63,7 @@
 
         var btn = $('#btn-scan');
         btn.disabled = true;
-        btn.querySelector('.btn-text').textContent = '扫描中...';
+        btn.querySelector('span').textContent = '扫描中...';
         showLoading('正在扫描目录...');
 
         try {
@@ -92,7 +92,7 @@
             showToast(err.message, 'error');
         } finally {
             btn.disabled = false;
-            btn.querySelector('.btn-text').textContent = '扫描';
+            btn.querySelector('span').textContent = '扫描';
             hideLoading();
         }
     });
@@ -111,7 +111,7 @@
             var div = document.createElement('div');
             div.className = 'file-item';
             div.innerHTML =
-                '<span class="file-name">📄 ' + escapeHtml(file.name) + '</span>' +
+                '<span class="file-name">' + escapeHtml(file.name) + '</span>' +
                 '<span class="file-size">' + formatSize(file.size) + '</span>';
             div.addEventListener('click', function () {
                 selectBagFile(file, div);
@@ -224,7 +224,7 @@
 
         var btn = $('#btn-process');
         btn.disabled = true;
-        btn.querySelector('.btn-text').textContent = '处理中...';
+        btn.querySelector('span').textContent = '处理中...';
         showLoading('正在解析 bag 文件并导出 CSV...');
         hideSection('section-result');
 
@@ -249,7 +249,7 @@
             showToast(err.message, 'error');
         } finally {
             btn.disabled = false;
-            btn.querySelector('.btn-text').textContent = '开始处理导出';
+            btn.querySelector('span').textContent = '开始处理导出';
             hideLoading();
         }
     });
@@ -268,21 +268,66 @@
             var div = document.createElement('div');
             div.className = 'result-file-item';
             div.innerHTML =
-                '<span class="csv-name">📊 ' + escapeHtml(file.name) + '</span>';
+                '<span class="csv-name">' + escapeHtml(file.name) + '</span>';
             container.appendChild(div);
         });
     }
 
     // ========== UI 辅助 ==========
 
+    var stepMap = {
+        'section-path': 1,
+        'section-files': 2,
+        'section-topics': 3,
+        'section-result': 4
+    };
+
+    function updateSteps() {
+        var maxVisible = 0;
+        var sections = ['section-path', 'section-files', 'section-topics', 'section-result'];
+        sections.forEach(function (id) {
+            var el = $('#' + id);
+            if (el && el.style.display !== 'none') {
+                var step = stepMap[id];
+                if (step > maxVisible) maxVisible = step;
+            }
+        });
+
+        for (var i = 1; i <= 4; i++) {
+            var indicator = document.querySelector('.step-indicator[data-step="' + i + '"]');
+            var line = indicator && indicator.nextElementSibling;
+            if (!indicator) continue;
+
+            indicator.classList.remove('active', 'done');
+
+            if (i < maxVisible) {
+                indicator.classList.add('done');
+                if (line && line.classList.contains('step-line')) {
+                    line.classList.add('done');
+                }
+            } else if (i === maxVisible) {
+                indicator.classList.add('active');
+                if (line && line.classList.contains('step-line')) {
+                    line.classList.remove('done');
+                }
+            } else {
+                if (line && line.classList.contains('step-line')) {
+                    line.classList.remove('done');
+                }
+            }
+        }
+    }
+
     function showSection(id) {
         var el = $('#' + id);
         if (el) el.style.display = '';
+        updateSteps();
     }
 
     function hideSection(id) {
         var el = $('#' + id);
         if (el) el.style.display = 'none';
+        updateSteps();
     }
 
     function escapeHtml(str) {
@@ -301,6 +346,8 @@
             var checked = this.checked;
             $('#max-msgs').disabled = checked;
         });
+
+        updateSteps();
     })();
 
 })();
