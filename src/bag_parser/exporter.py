@@ -1,3 +1,8 @@
+"""CSV 导出模块。
+
+将展平后的 topic 消息数据按 topic 分别导出为 CSV 文件，
+自动排除 header.* 和 layout.* 等冗余字段。
+"""
 import csv
 import os
 
@@ -7,6 +12,7 @@ def export_to_csv(topic_data, output_dir, bag_name):
     将 topic 消息数据导出为 CSV 文件。
 
     每个 topic 生成一个独立的 CSV 文件，文件名格式: {bag_name}_{safe_topic}.csv
+    CSV 列顺序: n_id, _time, ... (其他字段按出现顺序排列)
 
     参数:
         topic_data: {topic_name: [flattened_dict, ...]}
@@ -23,6 +29,7 @@ def export_to_csv(topic_data, output_dir, bag_name):
         if not msgs:
             continue
 
+        # 收集所有字段名（排除 _time、header.*、layout.*）
         other_fields = []
         for msg_dict in msgs:
             for key in msg_dict:
@@ -36,6 +43,7 @@ def export_to_csv(topic_data, output_dir, bag_name):
                     other_fields.append(key)
         all_fields = ['n_id', '_time'] + other_fields
 
+        # 生成安全的文件名：替换 / 为 _
         safe_topic = topic.replace("/", "_").strip("_")
         csv_path = os.path.join(output_dir, f"{bag_name}_{safe_topic}.csv")
 
@@ -43,6 +51,7 @@ def export_to_csv(topic_data, output_dir, bag_name):
             writer = csv.DictWriter(f, fieldnames=all_fields)
             writer.writeheader()
             for i, msg_dict in enumerate(msgs, 1):
+                # 过滤掉 header.* 和 layout.* 字段
                 row = {k: v for k, v in msg_dict.items()
                         if not k.startswith('header.') and not k.startswith('layout.')}
                 row = {'n_id': i, **row}

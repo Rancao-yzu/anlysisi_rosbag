@@ -1,3 +1,7 @@
+"""Bag 文件读取与 Topic 信息获取。
+
+通过 rosbag 库动态读取任意 ROS Bag 文件，无需预知消息类型。
+"""
 import os
 import rosbag
 
@@ -34,7 +38,7 @@ def read_messages(bag_path, topics, max_per_topic=3,
     参数:
         bag_path:  bag 文件路径
         topics:    要读取的 topic 名称列表
-        max_per_topic: 每个 topic 最多读取的消息数
+        max_per_topic: 每个 topic 最多读取的消息数（0 表示不限制）
         unpack_all_bytes_topics: 需要全量逐字节展开的 topic 名集合
 
     返回:
@@ -52,11 +56,13 @@ def read_messages(bag_path, topics, max_per_topic=3,
         if topic not in topic_set:
             continue
 
+        # 达到单 topic 上限后，若所有 topic 都已满足则提前退出遍历
         if max_per_topic > 0 and len(topic_msgs[topic]) >= max_per_topic:
             if all(len(topic_msgs[t]) >= max_per_topic for t in topics):
                 break
             continue
 
+        # 根据配置决定是否对该 topic 逐字节展开
         use_unpack_all = topic in unpack_set
         flat_msg = flatten_msg(msg, unpack_all_bytes=use_unpack_all)
         flat_msg['_time'] = t.to_sec()

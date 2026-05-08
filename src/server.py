@@ -1,8 +1,14 @@
+"""Flask Web 服务入口。
+
+提供 Web 界面用于浏览 bag 文件、选择 topic 并导出为 CSV。
+支持开发模式（python server.py）和 PyInstaller 打包后的独立运行。
+"""
 import os
 import sys
 
 from flask import Flask, request, jsonify, render_template
 
+# PyInstaller 打包后的资源路径
 base = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bag_parser import get_topic_info, read_messages, export_to_csv
@@ -12,13 +18,16 @@ app = Flask(__name__,
             static_folder='static',
             template_folder='templates')
 
+# 项目根目录：开发模式为 src/ 的父目录，打包模式为当前工作目录
 if getattr(sys, 'frozen', False):
     PROJECT_ROOT = os.getcwd()
 else:
     PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'output')
 
+
 def _filter_topics(topics_info):
+    """根据 config.TOPIC_EXCLUDE_KEYWORDS 过滤 topic，大小写不敏感匹配"""
     exclude_keywords = getattr(config, 'TOPIC_EXCLUDE_KEYWORDS', [])
     if not exclude_keywords:
         return topics_info
@@ -32,6 +41,7 @@ def _filter_topics(topics_info):
 
 
 def _get_unpack_topics(topics):
+    """根据 config.BYTE_UNPACK_TOPIC_KEYWORDS 匹配需要逐字节展开的 topic"""
     unpack_keywords = getattr(config, 'BYTE_UNPACK_TOPIC_KEYWORDS', [])
     if not unpack_keywords:
         return set()
@@ -40,11 +50,13 @@ def _get_unpack_topics(topics):
 
 @app.route('/')
 def index():
+    """渲染主页面"""
     return render_template('index.html')
 
 
 @app.route('/api/scan', methods=['POST'])
 def scan_path():
+    """扫描指定目录下的所有 .bag 文件，返回文件列表及基本信息"""
     data = request.get_json()
     target_path = (data or {}).get('path', '').strip()
 
@@ -84,6 +96,7 @@ def scan_path():
 
 @app.route('/api/topics', methods=['POST'])
 def list_topics():
+    """读取指定 bag 文件的所有 topic 信息（经过关键词过滤）"""
     data = request.get_json()
     bag_path = (data or {}).get('path', '').strip()
 
@@ -94,6 +107,7 @@ def list_topics():
         return jsonify({'ok': False, 'error': f'文件不存在: {bag_path}'}), 400
 
     try:
+        # 获取原始 topic 信息，再通过 config 关键词过滤
         topics_info = get_topic_info(bag_path)
         topics_info = _filter_topics(topics_info)
 
@@ -117,6 +131,7 @@ def list_topics():
 
 @app.route('/api/process', methods=['POST'])
 def process_bag():
+    """处理选中的 topic，读取消息并导出为 CSV"""
     data = request.get_json() or {}
     bag_path = data.get('path', '').strip()
     selected_topics = data.get('topics', [])
@@ -131,10 +146,12 @@ def process_bag():
 
     bag_name = os.path.splitext(os.path.basename(bag_path))[0]
 
+    # 输出目录: output/{bag_name}/
     output_dir = os.path.join(DEFAULT_OUTPUT_DIR, bag_name)
     os.makedirs(output_dir, exist_ok=True)
 
     try:
+        # 确定哪些 topic 需要逐字节展开，然后读取并导出
         unpack_set = _get_unpack_topics(selected_topics)
         topic_data = read_messages(bag_path, selected_topics, max_msgs,
                                    unpack_all_bytes_topics=unpack_set)
@@ -154,4 +171,5 @@ def process_bag():
 
 
 if __name__ == '__main__':
+    # 绑定 0.0.0.0 以便局域网内其他设备访问
     app.run(host='0.0.0.0', port=5000, debug=False)
