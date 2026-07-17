@@ -1,5 +1,6 @@
 build
 devel
+dist
 output
 *.ver
 *.pyc
