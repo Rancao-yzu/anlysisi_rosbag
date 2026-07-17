@@ -66,23 +66,12 @@ def apply_flat_style(style=None):
 
     font = (s["font_family"], s["font_size"])
     font_sm = (s["font_family"], s["font_size_sm"])
-    font_lg = (s["font_family"], s["font_size_lg"])
 
     # ---- 通用 ----
     style.configure('.',
                     background=s["bg"],
                     foreground=s["fg"],
                     font=font,
-                    borderwidth=0,
-                    relief='flat')
-
-    # ---- 框架 ----
-    style.configure('Card.TFrame',
-                    background=s["bg_card"],
-                    borderwidth=0,
-                    relief='flat')
-    style.configure('Header.TFrame',
-                    background=s["bg_secondary"],
                     borderwidth=0,
                     relief='flat')
 
@@ -135,29 +124,15 @@ def apply_flat_style(style=None):
               background=[('active', s["primary_hover"]),
                           ('disabled', s["border"])])
 
-    # ---- 输入框 ----
-    style.configure('TEntry',
-                    fieldbackground=s["bg"],
-                    borderwidth=0,
-                    relief='flat',
-                    padding=(8, 6))
-    style.map('TEntry',
-              bordercolor=[('focus', s["primary"])])
-
-    # ---- 进度条 ----
-    style.configure('TProgressbar',
-                    background=s["primary"],
-                    troughcolor=s["separator"],
-                    borderwidth=0,
-                    thickness=22)
-
     # ---- Checkbutton ----
     style.configure('TCheckbutton',
                     background=s["bg"],
                     foreground=s["fg"],
-                    font=font)
+                    font=font,
+                    padding=(4, 2))
     style.map('TCheckbutton',
-              background=[('active', s["bg"])])
+              background=[('active', s["bg_secondary"])],
+              foreground=[('selected', s["primary"])])
 
     # ---- Treeview (文件/结果列表) ----
     style.configure('Treeview',
@@ -176,21 +151,5 @@ def apply_flat_style(style=None):
               background=[('selected', s["bg_secondary"])],
               foreground=[('selected', s["fg"])])
 
-    # ---- Scrollbar ----
-    style.configure('TScrollbar',
-                    background=s["bg"],
-                    troughcolor=s["separator"],
-                    borderwidth=0,
-                    arrowcolor=s["fg_muted"])
-
-    # ---- Labelframe ----
-    style.configure('TLabelframe',
-                    background=s["bg"],
-                    borderwidth=0,
-                    relief='flat')
-    style.configure('TLabelframe.Label',
-                    background=s["bg"],
-                    foreground=s["fg"],
-                    font=(s["font_family"], s["font_size_sm"], 'bold'))
 
     return s, style
