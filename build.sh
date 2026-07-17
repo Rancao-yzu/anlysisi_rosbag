@@ -10,20 +10,20 @@ echo "  Bag Parser - Build Executable"
 echo "============================================"
 echo ""
 
-echo "[1/4] 清理缓存和旧构建 ..."
+echo "[1/3] 清理缓存和旧构建 ..."
 find "$SRC_DIR" -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 find "$SRC_DIR" -name "*.pyc" -delete 2>/dev/null || true
-rm -rf "$DIST_DIR" "$PROJECT_DIR/build" "$SRC_DIR/server.spec" 2>/dev/null || true
+rm -rf "$DIST_DIR" "$PROJECT_DIR/build" "$SRC_DIR/app.spec" 2>/dev/null || true
 echo "      清理完成"
 
-echo "[2/4] 检查环境 ..."
+echo "[2/3] 检查环境 ..."
 python3 --version
 
-echo "[3/4] 构建可执行文件 ..."
+echo "[3/3] 构建可执行文件 ..."
 EXCLUDES=(
-    # GUI / 图形
+    # GUI / 图形（保留 tkinter，排除其他）
     PySide2 PySide6 PyQt5 PyQt6 PyQt6_sip sip PyQt5_sip
-    tkinter customtkinter ttkbootstrap darkdetect
+    customtkinter ttkbootstrap darkdetect
     PyGObject pycairo PyICU PyOpenGL
     matplotlib matplotlib_inline cycler kiwisolver
 
@@ -100,12 +100,12 @@ done
 
 pyinstaller \
     --onefile \
-    --name bag_parser_server \
-    --add-data "$SRC_DIR/templates:templates" \
-    --add-data "$SRC_DIR/static:static" \
+    --name bag_parser \
     --add-data "$SRC_DIR/bag_parser:bag_parser" \
     --add-data "$SRC_DIR/config.py:." \
     --hidden-import rosbag \
+    --hidden-import tkinter \
+    --hidden-import tkinter.ttk \
     --exclude-module pkg_resources \
     --exclude-module jaraco \
     --exclude-module jaraco.text \
@@ -113,20 +113,6 @@ pyinstaller \
     --exclude-module jaraco.context \
     $EXCLUDE_ARGS \
     --clean \
-    "$SRC_DIR/server.py"
+    "$SRC_DIR/app.py"
 
 echo ""
-echo "[4/4] 复制可执行文件 ..."
-chmod +x "$DIST_DIR/bag_parser_server"
-cp "$DIST_DIR/bag_parser_server" "$PROJECT_DIR/bag_parser_server"
-
-echo ""
-echo "============================================"
-echo "  构建完成!"
-echo "  可执行文件: bag_parser_server"
-echo "  大小: $(du -h "$PROJECT_DIR/bag_parser_server" | cut -f1)"
-echo ""
-echo "  使用方式:"
-echo "    ./bag_parser_server"
-echo "    (服务启动后访问 http://127.0.0.1:5000)"
-echo "============================================"
