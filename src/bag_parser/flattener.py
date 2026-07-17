@@ -5,12 +5,19 @@
 """
 
 
+def _round_val(val, decimals=6):
+    """浮点数保留指定小数位，非浮点数原样返回"""
+    if isinstance(val, float):
+        return round(val, decimals)
+    return val
+
+
 def flatten_msg(msg, prefix="", unpack_all_bytes=False):
     """
     将任意 ROS 消息递归展平为扁平的键值字典。
 
     处理规则：
-        - 基本类型（int/float/str/bool）：直接保留值
+        - 基本类型（int/float/str/bool）：直接保留值，浮点数保留最多 6 位小数
         - 时间类型（有 secs/nsecs 属性）：转为浮点秒数
         - 嵌套消息（有 __slots__）：递归展平，key 用 . 连接
         - 数组/列表：逐个展平或逗号拼接
@@ -64,8 +71,9 @@ def flatten_msg(msg, prefix="", unpack_all_bytes=False):
                                          unpack_all_bytes=unpack_all_bytes)
                     result.update(nested)
             else:
-                result[key] = ", ".join(str(v) for v in value)
+                result[key] = ", ".join(
+                    str(_round_val(v)) for v in value)
         else:
-            result[key] = value
+            result[key] = _round_val(value)
 
     return result

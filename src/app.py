@@ -188,6 +188,8 @@ class BagParserApp:
         self._export_all_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(toolbar, text="导出全部", variable=self._export_all_var,
                         command=self._toggle_export_all).pack(side='left')
+        self._drop_zero_cols_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(toolbar, text="丢弃全零列", variable=self._drop_zero_cols_var).pack(side='left', padx=(12, 0))
 
         topic_outer = ttk.Frame(self._card3)
         topic_outer.pack(fill='both', expand=True, pady=(4, 0))
@@ -417,6 +419,7 @@ class BagParserApp:
             try:
                 unpack_set = _get_unpack_topics(selected)
                 n_topics = len(selected)
+                drop_zero = self._drop_zero_cols_var.get()
 
                 # ---- 阶段 1: 读取消息 ----
                 self.root.after(0, lambda: self._progress.configure(value=10))
@@ -435,7 +438,8 @@ class BagParserApp:
 
                 # ---- 阶段 2: 导出 CSV ----
                 csv_paths = export_to_csv(
-                    topic_data, output_dir, bag_name)
+                    topic_data, output_dir, bag_name,
+                    drop_zero_cols=drop_zero)
 
                 self.result_files = csv_paths
 
